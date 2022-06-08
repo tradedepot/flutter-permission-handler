@@ -38,6 +38,11 @@ final class PermissionManager implements PluginRegistry.ActivityResultListener, 
 
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (this.successCallback == null) {
+            return false;
+        }
+        RequestPermissionsSuccessCallback successCallback = this.successCallback;
+        this.successCallback = null;
         if (requestCode != PermissionConstants.PERMISSION_CODE_IGNORE_BATTERY_OPTIMIZATIONS &&
                 requestCode != PermissionConstants.PERMISSION_CODE_MANAGE_EXTERNAL_STORAGE &&
                 requestCode != PermissionConstants.PERMISSION_CODE_SYSTEM_ALERT_WINDOW &&
@@ -94,7 +99,6 @@ final class PermissionManager implements PluginRegistry.ActivityResultListener, 
         } else {
             return false;
         }
-
         HashMap<Integer, Integer> results = new HashMap<>();
         results.put(permission, status);
         successCallback.onSuccess(results);
@@ -103,6 +107,11 @@ final class PermissionManager implements PluginRegistry.ActivityResultListener, 
 
     @Override
     public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (this.successCallback == null) {
+            return false;
+        }
+        RequestPermissionsSuccessCallback successCallback = this.successCallback;
+        this.successCallback = null;
         if (requestCode != PermissionConstants.PERMISSION_CODE) {
             ongoing = false;
             return false;
@@ -111,7 +120,6 @@ final class PermissionManager implements PluginRegistry.ActivityResultListener, 
         if (requestResults == null) {
            return false;
         }
-
         for (int i = 0; i < permissions.length; i++) {
             final String permissionName = permissions[i];
 
@@ -168,8 +176,7 @@ final class PermissionManager implements PluginRegistry.ActivityResultListener, 
 
             PermissionUtils.updatePermissionShouldShowStatus(this.activity, permission);
         }
-
-        this.successCallback.onSuccess(requestResults);
+        successCallback.onSuccess(requestResults);
         ongoing = false;
         return true;
     }
