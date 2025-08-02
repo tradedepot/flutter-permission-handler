@@ -15,17 +15,13 @@ import io.flutter.plugin.common.MethodChannel;
  *
  * <p>Instantiate this in an add to app scenario to gracefully handle activity and context changes.
  * See {@code com.example.permissionhandlerexample.MainActivity} for an example.
- *
- * <p>Call {@link #registerWith(io.flutter.plugin.common.PluginRegistry.Registrar)} to register an
- * implementation of this that uses the stable {@code io.flutter.plugin.common} package.
  */
 public final class PermissionHandlerPlugin implements FlutterPlugin, ActivityAware {
 
     private final PermissionManager permissionManager;
     private MethodChannel methodChannel;
 
-    @SuppressWarnings("deprecation")
-    @Nullable private io.flutter.plugin.common.PluginRegistry.Registrar pluginRegistrar;
+
 
     @Nullable private ActivityPluginBinding pluginBinding;
 
@@ -36,28 +32,7 @@ public final class PermissionHandlerPlugin implements FlutterPlugin, ActivityAwa
         this.permissionManager = new PermissionManager();
     }
 
-    /**
-     * Registers a plugin implementation that uses the stable {@code io.flutter.plugin.common}
-     * package.
-     *
-     * <p>Calling this automatically initializes the plugin. However plugins initialized this way
-     * won't react to changes in activity or context, unlike {@link PermissionHandlerPlugin}.
-     */
-    @SuppressWarnings("deprecation")
-    public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
-        final PermissionHandlerPlugin plugin = new PermissionHandlerPlugin();
 
-        plugin.pluginRegistrar = registrar;
-        plugin.registerListeners();
-
-        plugin.startListening(registrar.context(), registrar.messenger());
-
-        if (registrar.activeContext() instanceof Activity) {
-            plugin.startListeningToActivity(
-                registrar.activity()
-            );
-        }
-    }
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
@@ -136,10 +111,7 @@ public final class PermissionHandlerPlugin implements FlutterPlugin, ActivityAwa
     }
 
     private void registerListeners() {
-        if (this.pluginRegistrar != null) {
-            this.pluginRegistrar.addActivityResultListener(this.permissionManager);
-            this.pluginRegistrar.addRequestPermissionsResultListener(this.permissionManager);
-        } else if (pluginBinding != null) {
+        if (pluginBinding != null) {
             this.pluginBinding.addActivityResultListener(this.permissionManager);
             this.pluginBinding.addRequestPermissionsResultListener(this.permissionManager);
         }
